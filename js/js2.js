@@ -43,70 +43,130 @@ var nav = {
 };
 
 //导航栏下的图片切换
-var silderMove = {
-	$silederNode: $('.main-silder-block li'),
-	$imgNode: $('.main-silder-img li'),
-	$leftNode: $('.main-silder .left'),
-	$rightNode: $('.main-silder .right'),
-	move: function(curPos, oldPos) {
-		var _this = this;
-		_this.$silederNode.eq(curPos).addClass('current');
-		_this.$silederNode.eq(oldPos).removeClass('current');
-		_this.$imgNode.eq(oldPos).stop(true, true).fadeOut();
-		_this.$imgNode.eq(curPos).stop(true, true).fadeIn();
-	},
-	getOldPos: function() {
-		var _this = this;
-		var i = 0;
-		for(; i < _this.$silederNode.length; i++) {
-			if(_this.$silederNode.eq(i).hasClass('current')) {
-				break;
-			}
+var silderMove={
+	liNode:$('.main-silder-img li'),
+	li2Node:$('.main-silder-block li'),
+	intervalFlag:null,
+	spanNode:$('.main-silder span'),
+	curPos:0,
+	nextFun:function(node){
+		var that=this;
+		window.clearInterval(that.intervalFlag);
+		var index=node.index();//0--左 1--右
+		if(index==0){
+			that.liNode.eq(that.curPos).removeClass('show');
+			that.li2Node.eq(that.curPos).removeClass('current');
+			that.curPos--;
+			that.curPos=that.curPos==-1?that.liNode.length-1:that.curPos;
+			that.liNode.eq(that.curPos).addClass('show');
+			that.li2Node.eq(that.curPos).addClass('current');	
 		}
-		return i;
+		else if(index==1){
+			that.liNode.eq(that.curPos).removeClass('show');
+			that.li2Node.eq(that.curPos).removeClass('current');
+			that.curPos++;
+			that.curPos=that.curPos>=that.liNode.length?0:that.curPos;
+			that.liNode.eq(that.curPos).addClass('show');
+			that.li2Node.eq(that.curPos).addClass('current');		
+		}
+		that.intervalFun();
 	},
-	init: function() {
-		var _this = this;
-		var curPos, oldPos;
-		_this.$silederNode.mouseover(function() {
-			curPos = $(this).index();
-			window.clearInterval(stop);
-			oldPos = _this.getOldPos();
-			_this.move(curPos, oldPos);
+	selectFun:function(index){
+		var that=this;
+		window.clearInterval(that.intervalFlag);
+		that.liNode.eq(that.curPos).removeClass('show');
+		that.li2Node.eq(that.curPos).removeClass('current');
+		that.liNode.eq(index).addClass('show');
+		that.li2Node.eq(index).addClass('current');		
+		that.curPos=index;
+		that.intervalFun();
+	},
+	intervalFun:function(){
+		var that=this;
+		that.intervalFlag=window.setInterval(function(){
+			that.liNode.eq(that.curPos).removeClass('show');
+			that.li2Node.eq(that.curPos).removeClass('current');
+			that.curPos++;
+			that.curPos=that.curPos>=that.liNode.length?0:that.curPos;
+			that.liNode.eq(that.curPos).addClass('show');
+			that.li2Node.eq(that.curPos).addClass('current');	
+		},3000);
+	},
+	init:function(){
+		var that=this;
+		that.intervalFun();
+		that.spanNode.click(function(){
+			that.nextFun($(this));
 		});
-		_this.$imgNode.mouseenter(function() {
-			console.log('abc');
-			window.clearInterval(stop);
-		});
-		var stop = window.setInterval(function() {
-			oldPos = _this.getOldPos();
-			if(oldPos + 1 < _this.$silederNode.length) {
-				curPos = oldPos + 1;
-			} else {
-				curPos = 0;
-			}
-			_this.move(curPos, oldPos);
-		}, 1000);
-		_this.$leftNode.click(function() {
-			oldPos = _this.getOldPos();
-			if(oldPos == 0) {
-				curPos = _this.$silederNode.length - 1;
-			} else {
-				curPos = oldPos - 1;
-			}
-			_this.move(curPos, oldPos);
-		});
-		_this.$rightNode.click(function() {
-			oldPos = _this.getOldPos();
-			if(oldPos == _this.$silederNode.length - 1) {
-				curPos = 0;
-			} else {
-				curPos = oldPos + 1;
-			}
-			_this.move(curPos, oldPos);
+		that.li2Node.click(function(){
+			that.selectFun($(this).index());
 		});
 	}
-};
+}
+// var silderMove = {
+// 	$silederNode: $('.main-silder-block li'),
+// 	$imgNode: $('.main-silder-img li'),
+// 	$leftNode: $('.main-silder .left'),
+// 	$rightNode: $('.main-silder .right'),
+// 	move: function(curPos, oldPos) {
+// 		var _this = this;
+// 		_this.$silederNode.eq(curPos).addClass('current');
+// 		_this.$silederNode.eq(oldPos).removeClass('current');
+// 		_this.$imgNode.eq(oldPos).stop(true, true).fadeOut();
+// 		_this.$imgNode.eq(curPos).stop(true, true).fadeIn();
+// 	},
+// 	getOldPos: function() {
+// 		var _this = this;
+// 		var i = 0;
+// 		for(; i < _this.$silederNode.length; i++) {
+// 			if(_this.$silederNode.eq(i).hasClass('current')) {
+// 				break;
+// 			}
+// 		}
+// 		return i;
+// 	},
+// 	init: function() {
+// 		var _this = this;
+// 		var curPos, oldPos;
+// 		_this.$silederNode.mouseover(function() {
+// 			curPos = $(this).index();
+// 			window.clearInterval(stop);
+// 			oldPos = _this.getOldPos();
+// 			_this.move(curPos, oldPos);
+// 		});
+// 		_this.$imgNode.mouseenter(function() {
+// 			console.log('abc');
+// 			window.clearInterval(stop);
+// 		});
+// 		var stop = window.setInterval(function() {
+// 			oldPos = _this.getOldPos();
+// 			if(oldPos + 1 < _this.$silederNode.length) {
+// 				curPos = oldPos + 1;
+// 			} else {
+// 				curPos = 0;
+// 			}
+// 			_this.move(curPos, oldPos);
+// 		}, 1000);
+// 		_this.$leftNode.click(function() {
+// 			oldPos = _this.getOldPos();
+// 			if(oldPos == 0) {
+// 				curPos = _this.$silederNode.length - 1;
+// 			} else {
+// 				curPos = oldPos - 1;
+// 			}
+// 			_this.move(curPos, oldPos);
+// 		});
+// 		_this.$rightNode.click(function() {
+// 			oldPos = _this.getOldPos();
+// 			if(oldPos == _this.$silederNode.length - 1) {
+// 				curPos = 0;
+// 			} else {
+// 				curPos = oldPos + 1;
+// 			}
+// 			_this.move(curPos, oldPos);
+// 		});
+// 	}
+// };
 //四个圈圈滑动的东西
 var intro_Move = {
 	$PosNode: $('.main-intro .main-show'), //需要被缩小的块
